@@ -1,5 +1,3 @@
-const User = require('../entities/User');
-
 const validateEmail = (email) => {
   return !email.match(
       /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
@@ -21,26 +19,9 @@ const validatePasswordLength = (password) => {
   }
 };
 
-const verifEmail = async (email) => {
-  const user = await User.findOne({email});
-  if (user) {
-    return true;
-  }
-  return false;
-};
-
-const verifUsername = async (username) => {
-  const user = await User.findOne({username});
-  if (user) {
-    return true;
-  }
-  return false;
-};
-
 module.exports = {
   validateEmail,
   validatePassword,
   validatePasswordLength,
-  verifEmail,
-  verifUsername,
 };
+
