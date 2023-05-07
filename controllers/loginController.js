@@ -4,7 +4,9 @@ const saltRounds = 10;
 const User = require('../entities/User');
 const {validateEmail,
   validatePassword,
-  validatePasswordLength} = require('../utils/validation');
+  validatePasswordLength,
+  verifEmail,
+  verifUsername} = require('../utils/validation');
 
 const register = async (req, res) => {
   const {username, email, password} = req.body;
@@ -23,16 +25,14 @@ const register = async (req, res) => {
   }
 
   // Validate Email
-  const verifEmail = await User.findOne({email: email});
-  if (verifEmail) {
+  if (verifEmail(email)) {
     return res.status(401).send({
       message: 'Email already exists.',
     });
   }
 
   // Validate Username
-  const verifUsername = await User.findOne({username: username});
-  if (verifUsername) {
+  if (verifUsername(username)) {
     return res.status(401).send({
       message: 'Username already exists.',
     });

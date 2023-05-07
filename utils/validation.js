@@ -41,4 +41,6 @@ module.exports = {
   validateEmail,
   validatePassword,
   validatePasswordLength,
+  verifEmail,
+  verifUsername,
 };
