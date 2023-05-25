@@ -6,22 +6,13 @@ const validateEmail = (email) => {
 
 const validatePassword = (password) => {
   return !password.match(
+      // The password must be between 8-16 characters and contain numbers
       /^(?=.*[0-9])[a-zA-Z0-9!@#$%^&*]{8,16}$/,
   );
-};
-
-const validatePasswordLength = (password) => {
-  const minPasswordofChars = 8;
-  const maxPasswordofChars = 16;
-  if (password.length < minPasswordofChars ||
-    password.length > maxPasswordofChars) {
-    return true;
-  }
 };
 
 module.exports = {
   validateEmail,
   validatePassword,
-  validatePasswordLength,
 };
 

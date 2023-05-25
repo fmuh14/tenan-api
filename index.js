@@ -1,16 +1,19 @@
 const express = require('express');
-const mongoose = require('mongoose');
 require('dotenv').config();
-const userRoute = require('./routes/login.js');
+const userRoute = require('./routes/userRoute.js');
+const {knex} = require('./configs/data-source.js');
+
+// Test the connection
+knex.raw('SELECT 1+1 AS result')
+    .then((results) => {
+      console.log('Connection to database successful.');
+    })
+    .catch((error) => {
+      console.error('Error connecting to the database:', error);
+    });
 
 const app = express();
 const port = process.env.PORT;
-
-// Mongo DB conncetion
-const database = process.env.MONGOLAB_URI;
-mongoose.connect(database, {useUnifiedTopology: true, useNewUrlParser: true})
-    .then(() => console.log('database connect'))
-    .catch((err) => console.log(err));
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -19,8 +22,8 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
-app.use('/', userRoute);
+app.use('/user/', userRoute);
 
 app.listen(port, () => {
-  console.log(`MapBan app listening at http://localhost:${port}`);
+  console.log(`Tenan app listening at http://localhost:${port}`);
 });
