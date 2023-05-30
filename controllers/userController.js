@@ -19,6 +19,7 @@ const register = async (req, res) => {
     });
   }
 
+  // Validate Email
   if (validateEmail(email)) {
     return res.status(400).send({
       code: '400',
@@ -29,6 +30,7 @@ const register = async (req, res) => {
     });
   }
 
+  // Validate Password
   if (validatePassword(password)) {
     return res.status(400).send({
       code: '400',
@@ -79,7 +81,11 @@ const register = async (req, res) => {
       user.password = hash;
       // Store user to DB
       knex('users').insert(user).then(res.status(200).send({
-        message: 'Register successfully.',
+        code: '200',
+        status: 'OK',
+        data: {
+          message: 'Register Success. Please Log in',
+        },
       }));
     });
   });
@@ -93,7 +99,11 @@ const login = async (req, res) => {
   const validUser = await knex('users').where('user_id', userId);
   if (validUser.length === 0) {
     return res.status(401).send({
-      message: 'Incorrect username or password.',
+      code: '401',
+      status: 'Unauthorized',
+      errors: {
+        message: 'Incorrect username or password',
+      },
     });
   }
 
@@ -104,14 +114,27 @@ const login = async (req, res) => {
         userId: validUser[0].user_id,
         name: validUser[0].name,
       };
+
+      // Make JWT
       const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,
           {expiresIn: '1hr'});
       const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 
-      res.json({accessToken, refreshToken});
+      res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        },
+      });
     } else {
       return res.status(401).send({
-        message: 'Incorrect username or password.',
+        code: '401',
+        status: 'Unauthorized',
+        errors: {
+          message: 'Incorrect username or password',
+        },
       });
     }
   });
@@ -123,9 +146,94 @@ const dashboard = async (req, res) => {
   });
 };
 
+const token = async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) {
+    return res.status(401).send({
+      code: '401',
+      status: 'Unauthorized',
+      errors: {
+        message: 'No refresh token provided',
+      },
+    });
+  }
+
+  jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, function(err, decoded) {
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        // Handle the expired token error
+        return res.status(401).send({
+          code: '401',
+          status: 'Unauthorized',
+          errors: {
+            message: 'Token expired',
+          },
+        });
+      } else if (err.name === 'JsonWebTokenError') {
+        return res.status(401).send({
+          code: '401',
+          status: 'Unauthorized',
+          errors: {
+            message: 'Token invalid',
+          },
+        });
+      }
+
+      console.log(err);
+      return res.status(401).send({
+        code: '401',
+        status: 'Unauthorized',
+        errors: {
+          message: 'Unknown Error',
+        },
+      });
+    }
+
+    console.log(decoded);
+    // Retrieve user detail
+    const {userId, name} = decoded;
+    const user = {
+      userId,
+      name,
+    };
+    console.log(user);
+
+    // Make JWT
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,
+        {expiresIn: '1hr'});
+
+    res.status(200).send({
+      code: '200',
+      status: 'OK',
+      data: {
+        accessToken: accessToken,
+      },
+    });
+  });
+};
+
+const logout = (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) {
+    return res.status(401).send({
+      code: '401',
+      status: 'Unauthorized',
+      errors: {
+        message: 'No refresh token provided',
+      },
+    });
+  }
+};
+
 module.exports = {
   login,
   register,
   dashboard,
+  token,
+  logout,
 };
 
