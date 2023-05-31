@@ -16,3 +16,13 @@ CREATE Table tokens (
   PRIMARY KEY (id_token),
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
+
+CREATE Table attractions (
+  id_wisata int primary key,
+  id_daerah int,
+  nama_tempat varchar(255),
+  category varchar(100),
+  alamat varchar(255),
+  rating float,
+  description text,
+)
