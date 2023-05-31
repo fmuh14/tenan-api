@@ -8,8 +8,9 @@ const {
 } = require('../utils/validation.js');
 
 const register = async (req, res) => {
-  const {userId, name, email, password} = req.body;
-  if (!userId || !name || !email || !password) {
+  const {name, email, password} = req.body;
+  // Check all attribute
+  if (!name || !email || !password) {
     return res.status(400).send({
       code: '400',
       status: 'Bad Request',
@@ -19,7 +20,7 @@ const register = async (req, res) => {
     });
   }
 
-  // Validate Email
+  // Validate Email format
   if (validateEmail(email)) {
     return res.status(400).send({
       code: '400',
@@ -42,9 +43,8 @@ const register = async (req, res) => {
     });
   }
 
-  // Validate Email
+  // Validate Email Exists
   const verifEmail = await knex('users').where('email', email);
-  console.log(verifEmail);
   if (verifEmail.length !== 0) {
     return res.status(409).send({
       code: '409',
@@ -55,20 +55,7 @@ const register = async (req, res) => {
     });
   }
 
-  // Validate Username
-  const verifUserId = await knex('users').where('user_id', userId);
-  if (verifUserId.length !== 0) {
-    return res.status(409).send({
-      code: '409',
-      status: 'Conflict',
-      errors: {
-        message: 'Username already exists',
-      },
-    });
-  }
-
   const user = {
-    user_id: userId,
     name,
     email,
     password,
@@ -92,17 +79,17 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const userId = req.body.userId;
+  const email = req.body.email;
   const password = req.body.password;
 
-  // Validate Username
-  const validUser = await knex('users').where('user_id', userId);
+  // Validate email
+  const validUser = await knex('users').where('email', email);
   if (validUser.length === 0) {
     return res.status(401).send({
       code: '401',
       status: 'Unauthorized',
       errors: {
-        message: 'Incorrect username or password',
+        message: 'Incorrect email or password',
       },
     });
   }
@@ -111,29 +98,41 @@ const login = async (req, res) => {
   bcrypt.compare(password, validUser[0].password, function(err, result) {
     if (result) {
       const user = {
-        userId: validUser[0].user_id,
+        email: validUser[0].email,
         name: validUser[0].name,
       };
 
       // Make JWT
       const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,
           {expiresIn: '1hr'});
-      const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+      const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET,
+          {expiresIn: '365d'});
 
-      res.status(200).send({
-        code: '200',
-        status: 'OK',
-        data: {
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        },
-      });
+      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET,
+          function(err, decoded) {
+            const data = {
+              user_id: validUser[0].user_id,
+              token: refreshToken,
+              created_at: new Date(decoded.iat * 1000).toISOString()
+                  .slice(0, 19).replace('T', ' '),
+              expires_at: new Date(decoded.exp * 1000).toISOString()
+                  .slice(0, 19).replace('T', ' '),
+            };
+            knex('tokens').insert(data).then(res.status(200).send({
+              code: '200',
+              status: 'OK',
+              data: {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+              },
+            }));
+          });
     } else {
       return res.status(401).send({
         code: '401',
         status: 'Unauthorized',
         errors: {
-          message: 'Incorrect username or password',
+          message: 'Incorrect email or password',
         },
       });
     }
@@ -150,6 +149,7 @@ const token = async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  // Check if token avaible
   if (token == null) {
     return res.status(401).send({
       code: '401',
@@ -160,6 +160,19 @@ const token = async (req, res) => {
     });
   }
 
+  // Check token in database
+  const validToken = await knex('tokens').where('token', token);
+  if (validToken.length === 0) {
+    return res.status(401).send({
+      code: '401',
+      status: 'Unauthorized',
+      errors: {
+        message: 'Invalid token. Please log in again',
+      },
+    });
+  }
+
+  // Verify Token
   jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, function(err, decoded) {
     if (err) {
       if (err.name === 'TokenExpiredError') {
@@ -168,7 +181,7 @@ const token = async (req, res) => {
           code: '401',
           status: 'Unauthorized',
           errors: {
-            message: 'Token expired',
+            message: 'Token expired. Please log in again',
           },
         });
       } else if (err.name === 'JsonWebTokenError') {
@@ -176,7 +189,7 @@ const token = async (req, res) => {
           code: '401',
           status: 'Unauthorized',
           errors: {
-            message: 'Token invalid',
+            message: 'Invalid token. Please log in again',
           },
         });
       }
@@ -191,14 +204,12 @@ const token = async (req, res) => {
       });
     }
 
-    console.log(decoded);
     // Retrieve user detail
-    const {userId, name} = decoded;
+    const {email, name} = decoded;
     const user = {
-      userId,
+      email,
       name,
     };
-    console.log(user);
 
     // Make JWT
     const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,

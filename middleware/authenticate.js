@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  console.log(token);
   if (token == null) {
     return res.status(401).send({
       code: '401',
@@ -25,6 +24,7 @@ const authenticateToken = (req, res, next) => {
           },
         });
       } else if (err.name === 'JsonWebTokenError') {
+        // Handle the invalid token error
         return res.status(401).send({
           code: '401',
           status: 'Unauthorized',
@@ -44,7 +44,6 @@ const authenticateToken = (req, res, next) => {
       });
     }
 
-    console.log(decoded);
     next();
   });
 };
