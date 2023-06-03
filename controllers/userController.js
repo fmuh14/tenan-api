@@ -227,14 +227,34 @@ const token = async (req, res) => {
 
 const attractions = async (req, res) => {
   try {
-    const attractions = await knex('attractions').select('*');
-    res.status(200).send({
-      code: '200',
-      status: 'OK',
-      data: {
-        attractions: attractions,
-      },
-    });
+    const region = await knex('region').select('region.nama_daerah');
+    // get attractions by region
+    if (region !=NULL) {
+      const attractions = await knex('attractions')
+          .select('attractions.nama_tempat', 'attractions.rating',
+              'regions.nama_daerah as region')
+          .leftJoin('regions', 'attractions.id_daerah', 'regions.id_daerah')
+          .orderBy('name', 'desc');
+      res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: {
+          attractions: attractions,
+        },
+      });
+    } else {
+      // get all attractions
+      const attractions = await knex('attractions')
+          .select('attractions.nama_tempat', 'attractions.rating')
+          .orderBy('name', 'desc');
+      res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: {
+          attractions: attractions,
+        },
+      });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send({
@@ -267,6 +287,7 @@ module.exports = {
   register,
   dashboard,
   token,
+  attractions,
   logout,
 };
 
