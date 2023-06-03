@@ -24,6 +24,17 @@ app.get('/', (req, res) => {
 
 app.use('/user/', userRoute);
 
+
+app.use(function(req, res, next) {
+  res.status(404).send({
+    code: '404',
+    status: 'Not Found',
+    errors: {
+      message: 'The page or resource you\'re looking for could not be found.',
+    },
+  });
+});
+
 app.listen(port, () => {
   console.log(`Tenan app listening at http://localhost:${port}`);
 });

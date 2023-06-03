@@ -8,21 +8,34 @@ CREATE Table users (
 );
 
 CREATE Table tokens (
-  id_token int AUTO_INCREMENT,
-  user_id int(11),
-  token varchar(100),
-  expiration timestamp,
-  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+  id_token int AUTO_INCREMENT NOT NULL,
+  user_id int(11) NOT NULL,
+  token varchar(100) NOT NULL,
+  expiration timestamp NOT NULL,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
   PRIMARY KEY (id_token),
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-)
+);
 
 CREATE Table attractions (
-  id_wisata int primary key,
-  id_daerah int,
-  nama_tempat varchar(255),
-  category varchar(100),
-  alamat varchar(255),
-  rating float,
-  description text,
-)
+  id_wisata int primary key NOT NULL,
+  rating float NOT NULL,
+  nama_tempat varchar(255) NOT NULL,
+  description text NOT NULL,
+  category varchar(100) NOT NULL,
+  id_daerah int NOT NULL,
+  alamat text NOT NULL,
+  FOREIGN KEY (id_daerah) REFERENCES city(id_daerah) ON DELETE CASCADE
+);
+
+CREATE Table cities (
+  id_daerah int primary key NOT NULL,
+  nama_daerah varchar(255) NOT NULL
+);
+
+CREATE Table attimages (
+  id_image int primary key AUTO_INCREMENT NOT NULL,
+  id_wisata int NOT NULL,
+  nama_image varchar(255) NOT NULL,
+  FOREIGN KEY (id_wisata) REFERENCES attractions(id_wisata) ON DELETE CASCADE
+);

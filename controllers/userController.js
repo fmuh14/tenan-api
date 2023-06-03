@@ -225,33 +225,12 @@ const token = async (req, res) => {
   });
 };
 
-const attractions = async (req, res) => {
-  try {
-    const attractions = await knex('attractions').select('*');
-    res.status(200).send({
-      code: '200',
-      status: 'OK',
-      data: {
-        attractions: attractions,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({
-      code: '500',
-      status: 'Internal Server Error',
-      errors: {
-        message: 'An error occurred while fetching attractions',
-      },
-    });
-  }
-};
 
 const logout = (req, res) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const refreshToken = authHeader && authHeader.split(' ')[1];
 
-  if (token == null) {
+  if (refreshToken == null) {
     return res.status(401).send({
       code: '401',
       status: 'Unauthorized',
@@ -259,9 +238,25 @@ const logout = (req, res) => {
         message: 'No refresh token provided',
       },
     });
+  };
+
+  try {
+    knex('tokens')
+        .where('token', refreshToken)
+        .del();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: 'An error occurred while delete token',
+      },
+    });
   }
 };
 
+// Export the function
 module.exports = {
   login,
   register,
