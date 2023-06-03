@@ -229,7 +229,7 @@ const attractions = async (req, res) => {
   try {
     const region = await knex('region').select('region.nama_daerah');
     // get attractions by region
-    if (region !=NULL) {
+    if (region != null) {
       const attractions = await knex('attractions')
           .select('attractions.nama_tempat', 'attractions.rating',
               'regions.nama_daerah as region')
