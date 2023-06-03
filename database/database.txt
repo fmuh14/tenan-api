@@ -17,6 +17,12 @@ CREATE Table tokens (
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
 
+CREATE Table regions (
+  id_daerah int AUTO_INCREMENT,
+  nama_daerah varchar(50)
+  PRIMARY KEY (id_daerah)
+);
+
 CREATE Table attractions (
   id_wisata int primary key,
   id_daerah int,
@@ -25,4 +31,5 @@ CREATE Table attractions (
   alamat varchar(255),
   rating float,
   description text,
-)
+  FOREIGN KEY (id_daerah) REFERENCES regions(id_daerah) ON DELETE CASCADE
+);
