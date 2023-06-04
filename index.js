@@ -1,6 +1,7 @@
 const express = require('express');
 require('dotenv').config();
 const userRoute = require('./routes/userRoute.js');
+const attractionsRoute = require('./routes/attractionsRoute.js');
 const {knex} = require('./configs/data-source.js');
 
 // Test the connection
@@ -22,7 +23,8 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
-app.use('/user/', userRoute);
+app.use('/users/', userRoute);
+app.use('/user/', attractionsRoute);
 
 
 app.use(function(req, res, next) {

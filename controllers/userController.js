@@ -225,7 +225,6 @@ const token = async (req, res) => {
   });
 };
 
-
 const logout = (req, res) => {
   const authHeader = req.headers['authorization'];
   const refreshToken = authHeader && authHeader.split(' ')[1];
@@ -239,7 +238,6 @@ const logout = (req, res) => {
       },
     });
   };
-
   try {
     knex('tokens')
         .where('token', refreshToken)
