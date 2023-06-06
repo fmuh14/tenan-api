@@ -23,8 +23,8 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
-app.use('/users/', userRoute);
-app.use('/user/', tourismsRoute);
+app.use('/user/', userRoute);
+app.use('/tourism/', tourismsRoute);
 
 
 app.use(function(req, res, next) {
