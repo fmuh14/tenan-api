@@ -100,6 +100,8 @@ const login = async (req, res) => {
       const user = {
         email: validUser[0].email,
         name: validUser[0].name,
+        user_id: validUser[0].user_id,
+        created_at: validUser[0].created_at,
       };
 
       // Make JWT
@@ -141,110 +143,112 @@ const login = async (req, res) => {
 
 const dashboard = async (req, res) => {
   res.send({
-    message: 'OK',
+    message: `Oke, ${req.email}`,
   });
 };
 
 const token = async (req, res) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  // Retrieve user detail
+  const {email, name} = req;
+  const user = {
+    email,
+    name,
+  };
 
-  // Check if token avaible
-  if (token == null) {
-    return res.status(401).send({
-      code: '401',
-      status: 'Unauthorized',
-      errors: {
-        message: 'No refresh token provided',
-      },
-    });
-  }
+  // Make JWT
+  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,
+      {expiresIn: '1hr'});
 
-  // Check token in database
-  const validToken = await knex('tokens').where('token', token);
-  if (validToken.length === 0) {
-    return res.status(401).send({
-      code: '401',
-      status: 'Unauthorized',
-      errors: {
-        message: 'Invalid token. Please log in again',
-      },
-    });
-  }
-
-  // Verify Token
-  jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, function(err, decoded) {
-    if (err) {
-      if (err.name === 'TokenExpiredError') {
-        // Handle the expired token error
-        return res.status(401).send({
-          code: '401',
-          status: 'Unauthorized',
-          errors: {
-            message: 'Token expired. Please log in again',
-          },
-        });
-      } else if (err.name === 'JsonWebTokenError') {
-        return res.status(401).send({
-          code: '401',
-          status: 'Unauthorized',
-          errors: {
-            message: 'Invalid token. Please log in again',
-          },
-        });
-      }
-
-      console.log(err);
-      return res.status(401).send({
-        code: '401',
-        status: 'Unauthorized',
-        errors: {
-          message: 'Unknown Error',
-        },
-      });
-    }
-
-    // Retrieve user detail
-    const {email, name} = decoded;
-    const user = {
-      email,
-      name,
-    };
-
-    // Make JWT
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn: '1hr'});
-
-    res.status(200).send({
-      code: '200',
-      status: 'OK',
-      data: {
-        accessToken: accessToken,
-      },
-    });
+  return res.status(200).send({
+    code: '200',
+    status: 'OK',
+    data: {
+      accessToken: accessToken,
+    },
   });
 };
 
-const logout = (req, res) => {
-  const authHeader = req.headers['authorization'];
-  const refreshToken = authHeader && authHeader.split(' ')[1];
-
-  if (refreshToken == null) {
-    return res.status(401).send({
-      code: '401',
-      status: 'Unauthorized',
-      errors: {
-        message: 'No refresh token provided',
-      },
-    });
-  };
+const logout = async (req, res) => {
+  const refreshToken = req.refreshToken;
   try {
-    knex('tokens')
+    const result = await knex('tokens')
         .where('token', refreshToken)
         .del();
+
+    if (result == 1) {
+      return res.status(200).send({
+        code: '200',
+        status: 'OK',
+        errors: {
+          message: 'Sign out success',
+        },
+      });
+    }
   } catch (error) {
     console.error(error);
-    res.status(500).send({
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: 'An error occurred while delete token',
+      },
+    });
+  }
+};
+
+const profile = async (req, res) => {
+  const {email} = req;
+
+  const result = await knex('users').where('email', email);
+
+  if (result.length == 1) {
+    const user = result[0];
+
+    return res.status(500).send({
+      code: '200',
+      status: 'OK',
+      data: {
+        user_id: user.user_id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  }
+};
+
+const addFavoriteTourism = async (req, res) => {
+  const data = {
+    user_id: req.user_id,
+    id_wisata: req.body.tourism_id,
+  };
+
+  knex('tourism_favorites').insert(data).then(res.status(200).send({
+    code: '200',
+    status: 'OK',
+    data: {
+      message: 'Added to favorites',
+    },
+  }));
+};
+
+const deleteFavoriteTourism = async (req, res) => {
+  try {
+    const result = await knex('tourism_favorites')
+        .where('id_wisata', req.params.tourism_id)
+        .del();
+
+    if (result == 1) {
+      return res.status(200).send({
+        code: '200',
+        status: 'OK',
+        errors: {
+          message: 'Removed from favorites',
+        },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
       code: '500',
       status: 'Internal Server Error',
       errors: {
@@ -261,5 +265,8 @@ module.exports = {
   dashboard,
   token,
   logout,
+  profile,
+  addFavoriteTourism,
+  deleteFavoriteTourism,
 };
 

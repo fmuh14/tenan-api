@@ -10,3 +10,5 @@ const {
 router.get('/tourisms', getAllTourisms);
 router.get('/tourisms/{city}', getTourismsbyCity);
 router.get('/tourisms/{tourismsId}', getTourismsDetail);
+
+module.exports = router;
