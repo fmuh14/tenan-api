@@ -1,15 +1,15 @@
 const {knex} = require('../configs/data-source.js');
 
-const getAllAttractions = async (req, res) => {
+const getAllTourisms = async (req, res) => {
   try {
-    const attractions = await knex('attractions')
-        .select('attractions.nama_tempat', 'attractions.rating')
+    const tourisms = await knex('tourisms')
+        .select('tourisms.nama_tempat', 'tourisms.rating')
         .orderBy('name', 'desc');
     res.status(200).send({
       code: '200',
       status: 'OK',
       data: {
-        attractions: attractions,
+        tourisms: tourisms,
       },
     });
   } catch (error) {
@@ -18,30 +18,30 @@ const getAllAttractions = async (req, res) => {
       code: '500',
       status: 'Internal Server Error',
       errors: {
-        message: 'An error occurred while fetching all attractions',
+        message: 'An error occurred while fetching all tourisms',
       },
     });
   }
 };
 
-const getAttractionsbyCity = async (req, res) => {
+const getTourismsbyCity = async (req, res) => {
   try {
     const city = req.body.city;
     if (city != null) {
-      const attractions = await knex('attractions')
-          .select('attractions.nama_tempat', 'attractions.rating',
+      const tourisms = await knex('tourisms')
+          .select('tourisms.nama_tempat', 'tourisms.rating',
               'cities.nama_daerah as city')
-          .leftJoin('cities', 'attractions.id_daerah', 'cities.id_daerah')
+          .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
           .orderBy('name', 'desc');
       res.status(200).send({
         code: '200',
         status: 'OK',
         data: {
-          attractions: attractions,
+          tourisms: tourisms,
         },
       });
     }
-    if (!attractions[0].city) {
+    if (!tourisms[0].city) {
       return res.status(404).send({
         code: '404',
         status: 'Not Found',
@@ -56,36 +56,36 @@ const getAttractionsbyCity = async (req, res) => {
       code: '500',
       status: 'Internal Server Error',
       errors: {
-        message: 'An error occurred while fetching attraction',
+        message: 'An error occurred while fetching tourism',
       },
     });
   }
 };
 
-const getAttractionsDetail = async (req, res) => {
+const getTourismsDetail = async (req, res) => {
   try {
-    const {attractionsId} = req.params.id;
-    const attraction = await knex('attractions')
-        .select('attractions.nama_tempat', 'attractions.rating',
-            'attractions.alamat', 'attractions.category',
-            'attractions.description')
-        .where('attractions.id', attractionsId)
+    const {tourismsId} = req.params.id;
+    const tourism = await knex('tourisms')
+        .select('tourisms.nama_tempat', 'tourisms.rating',
+            'tourisms.alamat', 'tourisms.category',
+            'tourisms.description')
+        .where('tourisms.id', tourismsId)
         .first();
 
     res.status(200).send({
       code: '200',
       status: 'OK',
       data: {
-        attractions: attraction,
+        tourisms: tourism,
       },
     });
 
-    if (!attraction) {
+    if (!tourism) {
       return res.status(404).send({
         code: '404',
         status: 'Not Found',
         errors: {
-          message: 'Attraction not found.',
+          message: 'Tourism not found.',
         },
       });
     }
@@ -95,7 +95,7 @@ const getAttractionsDetail = async (req, res) => {
       code: '500',
       status: 'Internal Server Error',
       errors: {
-        message: 'An error occurred while fetching attraction',
+        message: 'An error occurred while fetching tourism',
       },
     });
   }
@@ -103,7 +103,7 @@ const getAttractionsDetail = async (req, res) => {
 
 
 module.exports = {
-  getAllAttractions,
-  getAttractionsbyCity,
-  getAttractionsDetail,
+  getAllTourisms,
+  getTourismsbyCity,
+  getTourismsDetail,
 };
