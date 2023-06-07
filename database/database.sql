@@ -39,16 +39,18 @@ CREATE Table cities (
   nama_daerah varchar(255) NOT NULL
 );
 
+INSERT INTO CITIES VALUES (1,"jakarta"),(2,"yogyakarta"),(3,"bandung"),(4,"semarang"),(5,"surabaya");
+
 CREATE Table attimages (
   id_image int primary key AUTO_INCREMENT NOT NULL,
   id_wisata int NOT NULL,
   url_image varchar(255) NOT NULL,
-  FOREIGN KEY (id_wisata) REFERENCES attractions(id_wisata) ON DELETE CASCADE
+  FOREIGN KEY (id_wisata) REFERENCES tourisms(id_wisata) ON DELETE CASCADE
 );
 
 CREATE table tourism_favorites (
   user_id int NOT NULL,
   id_wisata int NOT NULL,
-  FOREIGN KEY (id_wisata) REFERENCES attractions(id_wisata) ON DELETE CASCADE,
+  FOREIGN KEY (id_wisata) REFERENCES tourisms(id_wisata) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
