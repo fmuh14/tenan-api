@@ -16,15 +16,23 @@ knex.raw('SELECT 1+1 AS result')
 const app = express();
 const port = process.env.PORT;
 
+/* eslint-disable new-cap */
+const v1Router = express.Router();
+
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  res.status(200).send({
+    code: '200',
+    status: 'OK',
+    message: 'Welcome to the Tenan API'});
 });
 
-app.use('/user/', userRoute);
-app.use('/tourism/', tourismsRoute);
+v1Router.use('/user', userRoute);
+v1Router.use('/tourism', tourismsRoute);
+
+app.use('/v1', v1Router);
 
 
 app.use(function(req, res, next) {

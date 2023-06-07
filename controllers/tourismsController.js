@@ -64,7 +64,7 @@ const getTourismsbyCity = async (req, res) => {
 
 const getTourismsDetail = async (req, res) => {
   try {
-    const {tourismsId} = req.params.id;
+    const {tourismsId} = req.params.tourismsId;
     const tourism = await knex('tourisms')
         .select('tourisms.nama_tempat', 'tourisms.rating',
             'tourisms.alamat', 'tourisms.category',
