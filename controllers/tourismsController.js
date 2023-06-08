@@ -101,7 +101,6 @@ const getTourismsDetail = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getAllTourisms,
   getTourismsbyCity,

@@ -141,12 +141,6 @@ const login = async (req, res) => {
   });
 };
 
-const dashboard = async (req, res) => {
-  res.send({
-    message: `Oke, ${req.email}`,
-  });
-};
-
 const token = async (req, res) => {
   // Retrieve user detail
   const {email, name} = req;
@@ -262,7 +256,6 @@ const deleteFavoriteTourism = async (req, res) => {
 module.exports = {
   login,
   register,
-  dashboard,
   token,
   logout,
   profile,
