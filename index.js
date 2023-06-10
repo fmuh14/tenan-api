@@ -30,7 +30,8 @@ app.get('/', (req, res) => {
 });
 
 v1Router.use('/user', userRoute);
-v1Router.use('/tourism', tourismsRoute);
+v1Router.use('/tourisms', tourismsRoute);
+v1Router.use('/lodgings', tourismsRoute);
 
 app.use('/v1', v1Router);
 

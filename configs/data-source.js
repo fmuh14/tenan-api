@@ -11,5 +11,4 @@ const knex = require('knex')({
   },
 });
 
-console.log(process.env.DB_USERNAME);
 module.exports = {knex};
