@@ -1,7 +1,7 @@
 const {knex} = require('../configs/data-source.js');
 
 const getAllTourisms = async (req, res) => {
-  const query = `%${req.query.q}%`;
+  const query = req.query.q;
   const city = req.query.city;
   const page = req.query.page;
 
@@ -80,7 +80,7 @@ const getAllTourisms = async (req, res) => {
       // mengecheck total row di table
       const totalQuery = await knex('tourisms')
           .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
-          .where('tourisms.nama_tempat', 'LIKE', query)
+          .where('tourisms.nama_tempat', 'LIKE', `%${query}%`)
           .count('* as total');
       total = totalQuery[0].total;
       totalPage = Math.ceil(total / size);
@@ -89,7 +89,7 @@ const getAllTourisms = async (req, res) => {
           .select('tourisms.nama_tempat', 'tourisms.rating',
               'cities.nama_daerah as city')
           .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
-          .where('tourisms.nama_tempat', 'LIKE', query)
+          .where('tourisms.nama_tempat', 'LIKE', `%${query}%`)
           .orderBy('nama_tempat', 'desc')
           .limit(size)
           .offset((pageNumber - 1) * size);
