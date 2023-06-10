@@ -7,8 +7,8 @@ const {
   getLodgingsbyCity,
   getLodgingsDetail} = require('../controllers/lodgingsController');
 
-router.get('/lodgings', getAllLodgings);
-router.get('/lodgings/{city}', getLodgingsbyCity);
-router.get('/lodgings/:lodgingsId', getLodgingsDetail);
+router.get('/', getAllLodgings);
+router.get('/:city', getLodgingsbyCity);
+router.get('/:lodgingsId', getLodgingsDetail);
 
 module.exports = router;
