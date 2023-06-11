@@ -17,12 +17,6 @@ CREATE Table tokens (
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE Table regions (
-  id_daerah int AUTO_INCREMENT,
-  nama_daerah varchar(50)
-  PRIMARY KEY (id_daerah)
-);
-
 CREATE Table tourisms (
   id_wisata int primary key NOT NULL,
   rating float NOT NULL,
@@ -31,7 +25,7 @@ CREATE Table tourisms (
   category varchar(100) NOT NULL,
   id_daerah int NOT NULL,
   alamat varchar(255) NOT NULL,
-  FOREIGN KEY (id_daerah) REFERENCES city(id_daerah) ON DELETE CASCADE
+  FOREIGN KEY (id_daerah) REFERENCES cities(id_daerah) ON DELETE CASCADE
 );
 
 CREATE Table cities (
@@ -41,7 +35,7 @@ CREATE Table cities (
 
 INSERT INTO CITIES VALUES (1,"jakarta"),(2,"yogyakarta"),(3,"bandung"),(4,"semarang"),(5,"surabaya");
 
-CREATE Table attimages (
+CREATE Table tourimages (
   id_image int primary key AUTO_INCREMENT NOT NULL,
   id_wisata int NOT NULL,
   url_image varchar(255) NOT NULL,
@@ -54,3 +48,19 @@ CREATE table tourism_favorites (
   FOREIGN KEY (id_wisata) REFERENCES tourisms(id_wisata) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+/* Location of tempat_wisata_msyql_csv */
+LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/database/tempat_wisata_mysql.csv' 
+INTO TABLE tourisms
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+/* Location of image_wisata_mysql.csv */
+LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/database/image_wisata_mysql.csv' 
+INTO TABLE tourimages
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;

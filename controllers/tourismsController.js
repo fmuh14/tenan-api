@@ -23,9 +23,14 @@ const getAllTourisms = async (req, res) => {
 
       // kembaliin semuanya tapi pake limit sesuai kesepakatan front-end
       tourisms = await knex('tourisms')
-          .select('tourisms.nama_tempat', 'tourisms.rating',
-              'cities.nama_daerah as city')
+          .select('tourisms.id_wisata as tourism_id',
+              'tourisms.nama_tempat as place_name',
+              'tourisms.rating',
+              'cities.nama_daerah as city',
+              'tourisms.category',
+              'tourimages.url_image as image_url')
           .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
+          .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
           .orderBy('tourisms.nama_tempat', 'desc').limit(size)
           .offset((pageNumber - 1) * size);
     } catch (error) {
@@ -49,9 +54,14 @@ const getAllTourisms = async (req, res) => {
       totalPage = Math.ceil(total / size);
 
       tourisms = await knex('tourisms')
-          .select('tourisms.nama_tempat', 'tourisms.rating',
-              'cities.nama_daerah as city')
+          .select('tourisms.id_wisata as tourism_id',
+              'tourisms.nama_tempat as place_name',
+              'tourisms.rating',
+              'cities.nama_daerah as city',
+              'tourisms.category',
+              'tourimages.url_image as image_url')
           .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
+          .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
           .where('cities.nama_daerah', city)
           .orderBy('nama_tempat', 'desc')
           .limit(size)
@@ -79,16 +89,20 @@ const getAllTourisms = async (req, res) => {
     try {
       // mengecheck total row di table
       const totalQuery = await knex('tourisms')
-          .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
           .where('tourisms.nama_tempat', 'LIKE', `%${query}%`)
           .count('* as total');
       total = totalQuery[0].total;
       totalPage = Math.ceil(total / size);
 
       tourisms = await knex('tourisms')
-          .select('tourisms.nama_tempat', 'tourisms.rating',
-              'cities.nama_daerah as city')
+          .select('tourisms.id_wisata as tourism_id',
+              'tourisms.nama_tempat as place_name',
+              'tourisms.rating',
+              'cities.nama_daerah as city',
+              'tourisms.category',
+              'tourimages.url_image as image_url')
           .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
+          .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
           .where('tourisms.nama_tempat', 'LIKE', `%${query}%`)
           .orderBy('nama_tempat', 'desc')
           .limit(size)
@@ -139,9 +153,16 @@ const getTourismsDetail = async (req, res) => {
   try {
     const tourismsId = req.params.tourismsId;
     const tourism = await knex('tourisms')
-        .select('tourisms.nama_tempat', 'tourisms.rating',
-            'tourisms.alamat', 'tourisms.category',
-            'tourisms.description')
+        .select('tourisms.id_wisata as tourism_id',
+            'tourisms.nama_tempat as place_name',
+            'tourisms.rating',
+            'tourisms.category',
+            'tourisms.description',
+            'tourisms.alamat as address',
+            'cities.nama_daerah as city',
+            'tourimages.url_image as image_url')
+        .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
+        .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
         .where('tourisms.id_wisata', tourismsId)
         .first();
 
