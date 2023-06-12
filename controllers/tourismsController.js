@@ -193,7 +193,29 @@ const getTourismsDetail = async (req, res) => {
   }
 };
 
+const getCity = async (req, res) => {
+  try {
+    const cities = await knex('cities').select('nama_daerah as city');
+    return res.status(200).send({
+      code: '200',
+      status: 'OK',
+      data: cities,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: 'An error occurred while fetching cities',
+      },
+    });
+  }
+};
+
+
 module.exports = {
   getAllTourisms,
   getTourismsDetail,
+  getCity
 };
