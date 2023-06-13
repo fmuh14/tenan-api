@@ -3,10 +3,10 @@ import pandas as pd # untuk manipulasi dan analisis data
 import pickle # # untuk serialisasi dan deserialisasi objek Python.
 import tensorflow as tf # untuk machine learning dan neural network.
 
-loaded_model = tf.keras.models.load_model('D:/Project/capstone-projects/tenan-project/python/saved_model/data_hotel.h5')
-with open('D:/Project/capstone-projects/tenan-project/python/saved_model/scaler.pkl', 'rb') as f:
+loaded_model = tf.keras.models.load_model('data_hotel.h5')
+with open('scaler.pkl', 'rb') as f:
     loaded_scaler = pickle.load(f)
-data_model = pd.read_csv('D:/Project/capstone-projects/tenan-project/python/saved_csv/processed_data_hotel.csv')
+data_model = pd.read_csv('processed_data_hotel.csv')
 
 def predict_rating(longitude, latitude):
     # Melakukan penskalaan terhadap longitude dan latitude menggunakan skalar yang telah dimuat sebelumnya.

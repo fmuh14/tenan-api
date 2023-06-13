@@ -216,17 +216,42 @@ const getCity = async (req, res) => {
 };
 
 const getPredictedHotel = async (req, res) => {
-  axios.post(process.env.URL_MACHINELEARNING, {
-    longtitude: 106.809331,
-    latitude: -6.216947,
-  }, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  }).then((response) => {
-    console.log(response.data);
-  }), (error) => {
-  };
+  try {
+    const {longtitude, latitude} = req.body;
+    const predictResponse = await axios.post(process.env.URL_MACHINELEARNING, {
+      longtitude: longtitude,
+      latitude: latitude,
+    }, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    const predictData = predictResponse.data.data;
+    const hotels = await knex('cities').select(
+        'lodgings.id_penginapan as lodging_id',
+        'lodgings.nama_tempat as place_name',
+        'lodgings.rating',
+        'cities.nama_daerah as city')
+        .from('lodgings')
+        .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+        .whereIn('lodgings.nama_tempat', predictData);
+
+    return res.status(200).send({
+      code: '200',
+      status: 'OK',
+      data: hotels,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: 'An error occurred while fetching predicted hotel',
+      },
+    });
+  }
 };
 
 module.exports = {
