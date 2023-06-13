@@ -67,6 +67,13 @@ CREATE Table lodgings (
   FOREIGN KEY (id_daerah) REFERENCES cities(id_daerah) ON DELETE CASCADE
 );
 
+CREATE Table lodimages (
+  id_image int primary key AUTO_INCREMENT NOT NULL,
+  id_penginapan int NOT NULL,
+  url_image varchar(255) NOT NULL,
+  FOREIGN KEY (id_penginapan) REFERENCES lodgings(id_penginapan) ON DELETE CASCADE
+);
+
 /* Location of tempat_wisata_msyql_csv */
 LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/database/tempat_wisata_mysql.csv' 
 INTO TABLE tourisms
@@ -86,6 +93,14 @@ IGNORE 1 ROWS;
 /* Location of data_hotel_mysql.csv */
 LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/database/data_hotel_mysql.csv' 
 INTO TABLE lodgings
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+/* Location of image_wisata_mysql.csv */
+LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/database/image_hotel_mysql.csv' 
+INTO TABLE tourimages
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'

@@ -5,10 +5,12 @@ const router = express.Router();
 const {
   getAllTourisms,
   getTourismsDetail,
-  getCity} = require('../controllers/tourismsController');
+  getCity,
+  getPredictedHotel} = require('../controllers/tourismsController');
 
 router.get('/', getAllTourisms);
 router.get('/city', getCity);
 router.get('/:tourismsId', getTourismsDetail);
+router.post('/predictHotel', getPredictedHotel);
 
 module.exports = router;
