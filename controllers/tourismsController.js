@@ -217,5 +217,5 @@ const getCity = async (req, res) => {
 module.exports = {
   getAllTourisms,
   getTourismsDetail,
-  getCity
+  getCity,
 };

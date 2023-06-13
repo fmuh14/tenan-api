@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const userRoute = require('./routes/userRoute.js');
 const tourismsRoute = require('./routes/tourismsRoute.js');
+const lodgingsRoute = require('./routes/lodgingsRoute.js');
 const {knex} = require('./configs/data-source.js');
 
 // Test the connection
@@ -31,7 +32,7 @@ app.get('/', (req, res) => {
 
 v1Router.use('/user', userRoute);
 v1Router.use('/tourisms', tourismsRoute);
-v1Router.use('/lodgings', tourismsRoute);
+v1Router.use('/lodgings', lodgingsRoute);
 
 app.use('/v1', v1Router);
 
