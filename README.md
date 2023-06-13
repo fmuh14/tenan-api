@@ -2,6 +2,17 @@
 
 # tenan-api
 How to use :
-1. NPM install
-2. Edit the environment variable and dont forget to create database and tables
-3. NPM run start-dev
+1. move to tenan-api folder
+```
+$ cd tenan-api
+```
+2. run NPM install
+```
+$ npm install
+```
+3. Edit the environment variable in .env file
+4. Create database and tables from database/database.sql 
+5. run NPM run start-dev
+```
+$ npm run start-dev
+```
