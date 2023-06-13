@@ -30,6 +30,8 @@ const getAllTourisms = async (req, res) => {
               'tourisms.rating',
               'cities.nama_daerah as city',
               'tourisms.category',
+              'tourisms.longtitude',
+              'tourisms.latitude',
               'tourimages.url_image as image_url')
           .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
           .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
@@ -61,6 +63,8 @@ const getAllTourisms = async (req, res) => {
               'tourisms.rating',
               'cities.nama_daerah as city',
               'tourisms.category',
+              'tourisms.longtitude',
+              'tourisms.latitude',
               'tourimages.url_image as image_url')
           .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
           .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
@@ -102,6 +106,8 @@ const getAllTourisms = async (req, res) => {
               'tourisms.rating',
               'cities.nama_daerah as city',
               'tourisms.category',
+              'tourisms.longtitude',
+              'tourisms.latitude',
               'tourimages.url_image as image_url')
           .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
           .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
@@ -160,6 +166,8 @@ const getTourismsDetail = async (req, res) => {
             'tourisms.rating',
             'tourisms.category',
             'tourisms.description',
+            'tourisms.longtitude',
+            'tourisms.latitude',
             'tourisms.alamat as address',
             'cities.nama_daerah as city',
             'tourimages.url_image as image_url')
