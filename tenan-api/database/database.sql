@@ -19,12 +19,14 @@ CREATE Table tokens (
 
 CREATE Table tourisms (
   id_wisata int primary key NOT NULL,
-  rating float NOT NULL,
   nama_tempat varchar(255) NOT NULL,
   description text NOT NULL,
   category varchar(100) NOT NULL,
-  id_daerah int NOT NULL,
+  rating float NOT NULL,
+  longtitude double NOT NULL,
+  latitude double NOT NULL,
   alamat varchar(255) NOT NULL,
+  id_daerah int NOT NULL,
   FOREIGN KEY (id_daerah) REFERENCES cities(id_daerah) ON DELETE CASCADE
 );
 
@@ -75,7 +77,7 @@ CREATE Table lodimages (
 );
 
 /* Location of tempat_wisata_msyql_csv */
-LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/database/tempat_wisata_mysql.csv' 
+LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/tenan-api/database/tempat_wisata_mysql.csv' 
 INTO TABLE tourisms
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
@@ -83,7 +85,7 @@ LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
 /* Location of image_wisata_mysql.csv */
-LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/database/image_wisata_mysql.csv' 
+LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/tenan-api/database/image_wisata_mysql.csv' 
 INTO TABLE tourimages
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
@@ -99,8 +101,8 @@ LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
 /* Location of image_wisata_mysql.csv */
-LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/database/image_hotel_mysql.csv' 
-INTO TABLE tourimages
+LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/tenan-api/database/image_hotel_mysql.csv' 
+INTO TABLE lodimages
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
