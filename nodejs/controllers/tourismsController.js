@@ -1,4 +1,6 @@
+const axios = require('axios');
 const {knex} = require('../configs/data-source.js');
+
 
 const getAllTourisms = async (req, res) => {
   const query = req.query.q;
@@ -213,9 +215,23 @@ const getCity = async (req, res) => {
   }
 };
 
+const getPredictedHotel = async (req, res) => {
+  axios.post(process.env.URL_MACHINELEARNING, {
+    longtitude: 106.809331,
+    latitude: -6.216947,
+  }, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  }).then((response) => {
+    console.log(response.data);
+  }), (error) => {
+  };
+};
 
 module.exports = {
   getAllTourisms,
   getTourismsDetail,
+  getPredictedHotel,
   getCity,
 };
