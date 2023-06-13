@@ -18,8 +18,8 @@ $ npm run start-dev
 ```
 
 ## Tenan API Documentation
-Swagger : [here](https://github.com/C23-PC620/tenan-api-swagger#how-to-open-swagger-ui) <br>
-Postman Collection : [here](https://www.postman.com/martian-meadow-395608/workspace/tenan-capstone-project-c23-pc620/collection/26683223-4e9cd0b8-56ac-46f4-8865-d411513cdabd?action=share&creator=26683223)
+__Swagger__ : [here](https://github.com/C23-PC620/tenan-api-swagger#how-to-open-swagger-ui) <br>
+__Postman Collection__ : [here](https://www.postman.com/martian-meadow-395608/workspace/tenan-capstone-project-c23-pc620/collection/26683223-4e9cd0b8-56ac-46f4-8865-d411513cdabd?action=share&creator=26683223)
 
 # model-deployment
 How to run model-deployment locally :
