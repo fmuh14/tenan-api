@@ -26,8 +26,11 @@ const getAllLodgings = async (req, res) => {
           .select('lodgings.id_penginapan as lodging_id',
               'lodgings.nama_tempat as place_name',
               'lodgings.rating',
-              'cities.nama_daerah as city')
+              'cities.nama_daerah as city',
+              'lodimages.url_image as image_url')
           .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+          .leftJoin('lodimages', 'lodgings.id_penginapan',
+              'lodimages.id_penginapan')
           .orderBy('lodgings.nama_tempat', 'desc').limit(size)
           .offset((pageNumber - 1) * size);
     } catch (error) {
@@ -54,8 +57,11 @@ const getAllLodgings = async (req, res) => {
           .select('lodgings.id_penginapan as lodging_id',
               'lodgings.nama_tempat as place_name',
               'lodgings.rating',
-              'cities.nama_daerah as city')
+              'cities.nama_daerah as city',
+              'lodimages.url_image as image_url')
           .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+          .leftJoin('lodimages', 'lodgings.id_penginapan',
+              'lodimages.id_penginapan')
           .where('cities.nama_daerah', city)
           .orderBy('nama_tempat', 'desc')
           .limit(size)
@@ -92,8 +98,11 @@ const getAllLodgings = async (req, res) => {
           .select('lodgings.id_penginapan as lodging_id',
               'lodgings.nama_tempat as place_name',
               'lodgings.rating',
-              'cities.nama_daerah as city')
+              'cities.nama_daerah as city',
+              'lodimages.url_image as image_url')
           .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+          .leftJoin('lodimages', 'lodgings.id_penginapan',
+              'lodimages.id_penginapan')
           .where('lodgings.nama_tempat', 'LIKE', `%${query}%`)
           .orderBy('nama_tempat', 'desc')
           .limit(size)
@@ -150,8 +159,11 @@ const getlodgingsDetail = async (req, res) => {
             'lodgings.alamat as address',
             'lodgings.longtitude',
             'lodgings.latitude',
-            'cities.nama_daerah as city')
+            'cities.nama_daerah as city',
+            'lodimages.url_image as image_url')
         .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+        .leftJoin('lodimages', 'lodgings.id_penginapan',
+            'lodimages.id_penginapan')
         .where('lodgings.id_penginapan', lodgingsId)
         .first();
 
