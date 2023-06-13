@@ -8,7 +8,7 @@ const {
   getCity} = require('../controllers/tourismsController');
 
 router.get('/', getAllTourisms);
-router.get('/:tourismsId', getTourismsDetail);
 router.get('/city', getCity);
+router.get('/:tourismsId', getTourismsDetail);
 
 module.exports = router;

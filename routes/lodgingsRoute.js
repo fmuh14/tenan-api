@@ -4,11 +4,9 @@ const router = express.Router();
 // const authenticateToken = require('../middleware/authenticate');
 const {
   getAllLodgings,
-  getLodgingsbyCity,
-  getLodgingsDetail} = require('../controllers/lodgingsController');
+  getlodgingsDetail} = require('../controllers/lodgingsController');
 
 router.get('/', getAllLodgings);
-router.get('/:city', getLodgingsbyCity);
-router.get('/:lodgingsId', getLodgingsDetail);
+router.get('/:lodgingsId', getlodgingsDetail);
 
 module.exports = router;

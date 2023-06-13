@@ -1,84 +1,159 @@
 const {knex} = require('../configs/data-source.js');
 
 const getAllLodgings = async (req, res) => {
-  try {
-    const lodgings = await knex('lodgings')
-        .select('lodgings.nama_tempat', 'lodgings.rating')
-        .orderBy('name', 'desc');
-    res.status(200).send({
-      code: '200',
-      status: 'OK',
-      data: {
-        lodgings: lodgings,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({
-      code: '500',
-      status: 'Internal Server Error',
-      errors: {
-        message: 'An error occurred while fetching all lodgings',
-      },
-    });
-  }
-};
+  const query = req.query.q;
+  const city = req.query.city;
+  const page = req.query.page;
 
-const getLodgingsbyCity = async (req, res) => {
-  try {
-    const city = req.body.city;
-    if (city != null) {
-      const lodgings = await knex('lodgings')
-          .select('lodgings.nama_tempat', 'lodgings.rating',
+  // Set the default value of page to 1 if it is not provided or invalid
+  const pageNumber = (page && /^\d+$/.test(page)) ? parseInt(page) : 1;
+
+  let total;
+  const size = 10;
+  let lodgings;
+  let totalPage;
+
+  // Mengecek apakah ada query q , city, dan page.
+  if (!query && !city) {
+    try {
+      // mengecheck total row di table
+      const totalQuery = await knex('lodgings').count('* as total');
+      total = totalQuery[0].total;
+      totalPage = Math.ceil(total / size);
+
+      // kembaliin semuanya tapi pake limit sesuai kesepakatan front-end
+      lodgings = await knex('lodgings')
+          .select('lodgings.id_penginapan as lodging_id',
+              'lodgings.nama_tempat as place_name',
+              'lodgings.rating',
               'cities.nama_daerah as city')
           .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
-          .orderBy('name', 'desc');
-      res.status(200).send({
-        code: '200',
-        status: 'OK',
-        data: {
-          lodgings: lodgings,
-        },
-      });
-    }
-    if (!lodgings[0].city) {
-      return res.status(404).send({
-        code: '404',
-        status: 'Not Found',
+          .orderBy('lodgings.nama_tempat', 'desc').limit(size)
+          .offset((pageNumber - 1) * size);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({
+        code: '500',
+        status: 'Internal Server Error',
         errors: {
-          message: 'City not found in the database',
+          message: 'An error occurred while fetching all lodgings',
         },
       });
     }
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({
-      code: '500',
-      status: 'Internal Server Error',
+  } else if (!query && city) {
+    try {
+      // mengecheck total row di table
+      const totalQuery = await knex('lodgings')
+          .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+          .where('cities.nama_daerah', city)
+          .count('* as total');
+      total = totalQuery[0].total;
+      totalPage = Math.ceil(total / size);
+
+      lodgings = await knex('lodgings')
+          .select('lodgings.id_penginapan as lodging_id',
+              'lodgings.nama_tempat as place_name',
+              'lodgings.rating',
+              'cities.nama_daerah as city')
+          .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+          .where('cities.nama_daerah', city)
+          .orderBy('nama_tempat', 'desc')
+          .limit(size)
+          .offset((pageNumber - 1) * size);
+      if (lodgings.length == 0 && totalPage == 0) {
+        return res.status(404).send({
+          code: '404',
+          status: 'Not Found',
+          errors: {
+            message: 'City not found in the database',
+          },
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({
+        code: '500',
+        status: 'Internal Server Error',
+        errors: {
+          message: 'An error occurred while fetching lodging',
+        },
+      });
+    }
+  } else if (query && !city) {
+    try {
+      // mengecheck total row di table
+      const totalQuery = await knex('lodgings')
+          .where('lodgings.nama_tempat', 'LIKE', `%${query}%`)
+          .count('* as total');
+      total = totalQuery[0].total;
+      totalPage = Math.ceil(total / size);
+
+      lodgings = await knex('lodgings')
+          .select('lodgings.id_penginapan as lodging_id',
+              'lodgings.nama_tempat as place_name',
+              'lodgings.rating',
+              'cities.nama_daerah as city')
+          .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+          .where('lodgings.nama_tempat', 'LIKE', `%${query}%`)
+          .orderBy('nama_tempat', 'desc')
+          .limit(size)
+          .offset((pageNumber - 1) * size);
+      if (lodgings.length == 0 && totalPage == 0) {
+        return res.status(404).send({
+          code: '404',
+          status: 'Not Found',
+          errors: {
+            message: 'Places not found in the database',
+          },
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({
+        code: '500',
+        status: 'Internal Server Error',
+        errors: {
+          message: 'An error occurred while fetching lodging',
+        },
+      });
+    }
+  }
+
+  if (pageNumber > totalPage) {
+    return res.status(404).send({
+      code: '404',
+      status: 'Not Found',
       errors: {
-        message: 'An error occurred while fetching lodging',
+        message: 'The requested page does not exist',
       },
+    });
+  } else {
+    return res.status(200).send({
+      code: '200',
+      status: 'OK',
+      current_page: pageNumber,
+      total_page: totalPage,
+      total: total,
+      size: lodgings.length,
+      data: lodgings,
     });
   }
 };
 
 const getlodgingsDetail = async (req, res) => {
   try {
-    const {lodgingsId} = req.params.lodgingsId;
+    const lodgingsId = req.params.lodgingsId;
     const lodging = await knex('lodgings')
-        .select('lodgings.nama_tempat', 'lodgings.rating',
-            'lodgings.alamat', 'lodgings.category',
-            'lodgings.description')
-        .where('lodgings.id', lodgingsId)
+        .select('lodgings.id_penginapan as lodging_id',
+            'lodgings.nama_tempat as place_name',
+            'lodgings.rating',
+            'lodgings.alamat as address',
+            'lodgings.longtitude',
+            'lodgings.latitude',
+            'cities.nama_daerah as city')
+        .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+        .where('lodgings.id_penginapan', lodgingsId)
         .first();
-
-    res.status(200).send({
-      code: '200',
-      status: 'OK',
-      data: {
-        lodgings: lodging,
-      },
-    });
 
     if (!lodging) {
       return res.status(404).send({
@@ -87,6 +162,12 @@ const getlodgingsDetail = async (req, res) => {
         errors: {
           message: 'Lodging not found.',
         },
+      });
+    } else {
+      return res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: lodging,
       });
     }
   } catch (error) {
@@ -103,6 +184,5 @@ const getlodgingsDetail = async (req, res) => {
 
 module.exports = {
   getAllLodgings,
-  getLodgingsbyCity,
-  getLodgingsDetail,
+  getlodgingsDetail,
 };
