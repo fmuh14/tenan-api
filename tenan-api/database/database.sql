@@ -23,8 +23,8 @@ CREATE Table tourisms (
   description text NOT NULL,
   category varchar(100) NOT NULL,
   rating float NOT NULL,
-  longtitude double NOT NULL,
   latitude double NOT NULL,
+  longtitude double NOT NULL,
   alamat varchar(255) NOT NULL,
   id_daerah int NOT NULL,
   FOREIGN KEY (id_daerah) REFERENCES cities(id_daerah) ON DELETE CASCADE

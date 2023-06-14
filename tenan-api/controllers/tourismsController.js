@@ -223,7 +223,7 @@ const getCity = async (req, res) => {
   }
 };
 
-const getPredictedHotel = async (req, res) => {
+const getRecommendedHotels = async (req, res) => {
   try {
     const {longtitude, latitude} = req.body;
     const predictResponse = await axios.post(process.env.URL_MACHINELEARNING, {
@@ -265,6 +265,6 @@ const getPredictedHotel = async (req, res) => {
 module.exports = {
   getAllTourisms,
   getTourismsDetail,
-  getPredictedHotel,
+  getRecommendedHotels,
   getCity,
 };

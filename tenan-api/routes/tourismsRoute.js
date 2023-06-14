@@ -6,11 +6,11 @@ const {
   getAllTourisms,
   getTourismsDetail,
   getCity,
-  getPredictedHotel} = require('../controllers/tourismsController');
+  getRecommendedHotel} = require('../controllers/tourismsController');
 
 router.get('/', getAllTourisms);
 router.get('/city', getCity);
 router.get('/:tourismsId', getTourismsDetail);
-router.post('/predictHotel', getPredictedHotel);
+router.post('/recommendedHotels', getRecommendedHotel);
 
 module.exports = router;
