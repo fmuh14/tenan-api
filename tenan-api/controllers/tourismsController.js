@@ -226,7 +226,7 @@ const getCity = async (req, res) => {
 const getRecommendedHotels = async (req, res) => {
   try {
     const {longtitude, latitude} = req.body;
-    const predictResponse = await axios.post(process.env.URL_MACHINELEARNING, {
+    const predictResponse = await axios.post(process.env.URL_ML_HOTEL, {
       longtitude: longtitude,
       latitude: latitude,
     }, {
@@ -262,9 +262,48 @@ const getRecommendedHotels = async (req, res) => {
   }
 };
 
+const getRecommendedTourisms = async (req, res) => {
+  try {
+    const city = req.body;
+    const predictResponse = await axios.post(process.env.URL_ML_TOURISM, {
+      city : city,
+    });
+
+    const predictData = predictResponse.data.data;
+    const tourisms = await knex('tourisms').select(
+        'tourisms.id_wisata as tourism_id',
+        'tourisms.nama_tempat as place_name',
+        'tourisms.rating',
+        'cities.nama_daerah as city',
+        'tourisms.category',
+        'tourisms.longtitude',
+        'tourisms.latitude',
+        'tourimages.url_image as image_url')
+        .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
+        .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
+        .whereIn('tourisms.nama_tempat', predictData);
+
+    return res.status(200).send({
+      code: '200',
+      status: 'OK',
+      data: tourisms,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: 'An error occurred while fetching predicted tourisms',
+      },
+    });
+  }
+};
+
 module.exports = {
   getAllTourisms,
   getTourismsDetail,
   getRecommendedHotels,
   getCity,
+  getRecommendedTourisms,
 };
