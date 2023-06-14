@@ -15,15 +15,11 @@ data_model = pd.read_csv('destinasi_wisata_baru.csv')
 data_model.drop_duplicates(inplace=True)
 data_model.dropna(inplace=True)
 
-# Function for recommendation based on city and budget
-def recommend_places_2(city, budget, top_n=5): #top_n = wisata
-    # Filter the data based on the input city and budget
-    harga = data_model['Price'] * top_n
-    recommendations = data_model[(data_model['City'].str.contains(city, case=False, na=False)) & (harga <= budget)]
-
-    # Calculate the absolute difference between the budget and the price, then sort the data based on this difference
-    recommendations['abs_diff'] = abs(recommendations['Price'] - budget)
-    recommendations.sort_values(by='abs_diff', ascending=True, inplace=True)
+# Function for recommendation based on city
+def recommend_places(city, top_n=5): #top_n = wisata
+    # Filter the data based on the input city 
+    recommendations = data_model[(data_model['City'].str.contains(city, case=False, na=False))]
+    recommendations.sort_values(by='Rating', ascending=True, inplace=True)
 
     # Return the top_n results
     return recommendations.head(top_n)
