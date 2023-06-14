@@ -29,7 +29,7 @@ def predictHotel():
 def predictTourism():
    city = request.form.get(["nama_daerah"])
 
-   predict_result = predict_wisata.recommend_places_2(city, top_n=5)
+   predict_result = predict_wisata.recommend_places(city, top_n=5)
    response = {
        'data' : predict_result
    }
