@@ -11,6 +11,6 @@ const {
 router.get('/', getAllTourisms);
 router.get('/city', getCity);
 router.get('/:tourismsId', getTourismsDetail);
-router.post('/recommendedHotel', getRecommendedHotel);
+router.post('/recommendedHotels', getRecommendedHotel);
 
 module.exports = router;
