@@ -27,7 +27,7 @@ def predictHotel():
 
 @app.route('/api/predictTourism', methods=['POST'])
 def predictTourism():
-   city = request.form.get(["nama_daerah"])
+   city = str(request.form(["city"]))
 
    predict_result = predict_wisata.recommend_places(city, top_n=5)
    response = {
