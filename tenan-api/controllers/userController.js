@@ -216,6 +216,19 @@ const addFavoriteTourism = async (req, res) => {
     id_wisata: req.body.tourism_id,
   };
 
+  const checkIfExist = await knex('tourisms')
+      .where('tourisms.id_wisata', data.id_wisata);
+
+  if (checkIfExist.length == 0) {
+    return res.status(404).send({
+      code: '404',
+      status: 'Not Found',
+      errors: {
+        message: 'the tourism ID you provided does not exist in our records',
+      },
+    });
+  };
+
   knex('tourism_favorites').insert(data).then(res.status(200).send({
     code: '200',
     status: 'OK',
@@ -235,9 +248,176 @@ const deleteFavoriteTourism = async (req, res) => {
       return res.status(200).send({
         code: '200',
         status: 'OK',
-        errors: {
+        data: {
           message: 'Removed from favorites',
         },
+      });
+    } else {
+      return res.status(404).send({
+        code: '404',
+        status: 'Not Found',
+        errors: {
+          message: 'the tourism ID you provided does not exist in our records',
+        },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: 'An error occurred while delete token',
+      },
+    });
+  }
+};
+
+const showFavoriteTourisms = async (req, res) => {
+  try {
+    const result = await knex('tourism_favorites')
+        .select('tourism_favorites.id_wisata')
+        .where('user_id', req.user_id);
+
+    if (result.length == 0) {
+      return res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: {
+          message: 'No favorite tourisms added',
+        },
+      });
+    } else {
+      const idArray = result.map((obj) => obj.id_wisata);
+
+      const tourismsData = await knex('tourisms')
+          .select('tourisms.id_wisata as tourism_id',
+              'tourisms.nama_tempat as place_name',
+              'tourisms.rating',
+              'cities.nama_daerah as city',
+              'tourisms.category',
+              'tourisms.longtitude',
+              'tourisms.latitude',
+              'tourimages.url_image as image_url')
+          .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
+          .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
+          .whereIn('tourisms.id_wisata', idArray)
+          .orderBy('place_name', 'asc');
+
+      return res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: tourismsData,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: 'An error occurred while delete token',
+      },
+    });
+  }
+};
+
+const addFavoriteLodging = async (req, res) => {
+  const data = {
+    user_id: req.user_id,
+    id_penginapan: req.body.lodging_id,
+  };
+
+  const checkIfExist = await knex('lodgings')
+      .where('lodgings.id_penginapan', data.id_penginapan);
+
+  if (checkIfExist.length == 0) {
+    return res.status(404).send({
+      code: '404',
+      status: 'Not Found',
+      errors: {
+        message: 'the lodging ID you provided does not exist in our records',
+      },
+    });
+  };
+
+  knex('lodging_favorites').insert(data).then(res.status(200).send({
+    code: '200',
+    status: 'OK',
+    data: {
+      message: 'Added to favorites',
+    },
+  }));
+};
+
+const deleteFavoriteLodging = async (req, res) => {
+  try {
+    const result = await knex('lodging_favorites')
+        .where('id_penginapan', req.params.lodging_id)
+        .del();
+
+    if (result == 1) {
+      return res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: {
+          message: 'Removed from favorites',
+        },
+      });
+    } else {
+      return res.status(404).send({
+        code: '404',
+        status: 'Not Found',
+        errors: {
+          message: 'the lodging ID you provided does not exist in our records',
+        },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: 'An error occurred while delete favorited lodging',
+      },
+    });
+  }
+};
+
+const showFavoriteLodgings = async (req, res) => {
+  try {
+    const result = await knex('lodging_favorites')
+        .select('lodging_favorites.id_penginapan')
+        .where('user_id', req.user_id);
+
+    if (result.length == 0) {
+      return res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: {
+          message: 'No favorite lodgings added',
+        },
+      });
+    } else {
+      const idArray = result.map((obj) => obj.id_penginapan);
+
+      const lodgingsData = await knex('lodgings')
+          .select('lodgings.id_penginapan as lodging_id',
+              'lodgings.nama_tempat as place_name',
+              'lodgings.rating',
+              'cities.nama_daerah as city',
+              'lodimages.url_image as image_url')
+          .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+          .leftJoin('lodimages', 'lodgings.id_penginapan',
+              'lodimages.id_penginapan')
+          .whereIn('lodgings.id_penginapan', idArray)
+          .orderBy('place_name', 'asc');
+
+      return res.status(200).send({
+        code: '200',
+        status: 'OK',
+        data: lodgingsData,
       });
     }
   } catch (error) {
@@ -261,5 +441,9 @@ module.exports = {
   profile,
   addFavoriteTourism,
   deleteFavoriteTourism,
+  showFavoriteTourisms,
+  addFavoriteLodging,
+  deleteFavoriteLodging,
+  showFavoriteLodgings,
 };
 

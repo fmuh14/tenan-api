@@ -76,6 +76,13 @@ CREATE Table lodimages (
   FOREIGN KEY (id_penginapan) REFERENCES lodgings(id_penginapan) ON DELETE CASCADE
 );
 
+CREATE table lodging_favorites (
+  user_id int NOT NULL,
+  id_penginapan int NOT NULL,
+  FOREIGN KEY (id_penginapan) REFERENCES lodgings(id_penginapan) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
 /* Location of tempat_wisata_msyql_csv */
 LOAD DATA INFILE 'D:/Project/capstone-projects/tenan-project/tenan-api/database/tempat_wisata_mysql.csv' 
 INTO TABLE tourisms
