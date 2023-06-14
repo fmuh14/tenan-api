@@ -184,7 +184,7 @@ const logout = async (req, res) => {
       code: '500',
       status: 'Internal Server Error',
       errors: {
-        message: 'An error occurred while delete token',
+        message: 'An error occurred while fetching data',
       },
     });
   }
@@ -198,7 +198,7 @@ const profile = async (req, res) => {
   if (result.length == 1) {
     const user = result[0];
 
-    return res.status(500).send({
+    return res.status(200).send({
       code: '200',
       status: 'OK',
       data: {
@@ -211,31 +211,56 @@ const profile = async (req, res) => {
 };
 
 const addFavoriteTourism = async (req, res) => {
-  const data = {
-    user_id: req.user_id,
-    id_wisata: req.body.tourism_id,
-  };
+  try {
+    const data = {
+      user_id: req.user_id,
+      id_wisata: req.body.tourism_id,
+    };
 
-  const checkIfExist = await knex('tourisms')
-      .where('tourisms.id_wisata', data.id_wisata);
+    const checkIfExist = await knex('tourisms')
+        .where('tourisms.id_wisata', data.id_wisata);
 
-  if (checkIfExist.length == 0) {
-    return res.status(404).send({
-      code: '404',
-      status: 'Not Found',
+    if (checkIfExist.length == 0) {
+      return res.status(404).send({
+        code: '404',
+        status: 'Not Found',
+        errors: {
+          message: 'the tourism ID you provided does not exist in our records',
+        },
+      });
+    };
+
+    const checkIfFavoritedExist = await knex('tourism_favorites')
+        .where(data);
+
+    if (checkIfFavoritedExist.length != 0) {
+      return res.status(404).send({
+        code: '404',
+        status: 'Not Found',
+        errors: {
+          message:
+          'the tourism ID you provided already added to your favorites',
+        },
+      });
+    }
+
+    knex('tourism_favorites').insert(data).then(res.status(200).send({
+      code: '200',
+      status: 'OK',
+      data: {
+        message: 'Added to favorites',
+      },
+    }));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
       errors: {
-        message: 'the tourism ID you provided does not exist in our records',
+        message: 'An error occurred while fetching data',
       },
     });
-  };
-
-  knex('tourism_favorites').insert(data).then(res.status(200).send({
-    code: '200',
-    status: 'OK',
-    data: {
-      message: 'Added to favorites',
-    },
-  }));
+  }
 };
 
 const deleteFavoriteTourism = async (req, res) => {
@@ -267,7 +292,7 @@ const deleteFavoriteTourism = async (req, res) => {
       code: '500',
       status: 'Internal Server Error',
       errors: {
-        message: 'An error occurred while delete token',
+        message: 'An error occurred while fetching data',
       },
     });
   }
@@ -316,38 +341,63 @@ const showFavoriteTourisms = async (req, res) => {
       code: '500',
       status: 'Internal Server Error',
       errors: {
-        message: 'An error occurred while delete token',
+        message: 'An error occurred while fetching data',
       },
     });
   }
 };
 
 const addFavoriteLodging = async (req, res) => {
-  const data = {
-    user_id: req.user_id,
-    id_penginapan: req.body.lodging_id,
-  };
+  try {
+    const data = {
+      user_id: req.user_id,
+      id_penginapan: req.body.lodging_id,
+    };
 
-  const checkIfExist = await knex('lodgings')
-      .where('lodgings.id_penginapan', data.id_penginapan);
+    const checkIfExist = await knex('lodgings')
+        .where('lodgings.id_penginapan', data.id_penginapan);
 
-  if (checkIfExist.length == 0) {
-    return res.status(404).send({
-      code: '404',
-      status: 'Not Found',
+    if (checkIfExist.length == 0) {
+      return res.status(404).send({
+        code: '404',
+        status: 'Not Found',
+        errors: {
+          message: 'the lodging ID you provided does not exist in our records',
+        },
+      });
+    };
+
+    const checkIfFavoritedExist = await knex('lodging_favorites')
+        .where(data);
+
+    if (checkIfFavoritedExist.length != 0) {
+      return res.status(404).send({
+        code: '404',
+        status: 'Not Found',
+        errors: {
+          message:
+          'the lodging ID you provided already added to your favorites',
+        },
+      });
+    }
+
+    knex('lodging_favorites').insert(data).then(res.status(200).send({
+      code: '200',
+      status: 'OK',
+      data: {
+        message: 'Added to favorites',
+      },
+    }));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
       errors: {
-        message: 'the lodging ID you provided does not exist in our records',
+        message: 'An error occurred while fetching data',
       },
     });
-  };
-
-  knex('lodging_favorites').insert(data).then(res.status(200).send({
-    code: '200',
-    status: 'OK',
-    data: {
-      message: 'Added to favorites',
-    },
-  }));
+  }
 };
 
 const deleteFavoriteLodging = async (req, res) => {
@@ -379,7 +429,7 @@ const deleteFavoriteLodging = async (req, res) => {
       code: '500',
       status: 'Internal Server Error',
       errors: {
-        message: 'An error occurred while delete favorited lodging',
+        message: 'An error occurred while fetching data',
       },
     });
   }
@@ -426,7 +476,7 @@ const showFavoriteLodgings = async (req, res) => {
       code: '500',
       status: 'Internal Server Error',
       errors: {
-        message: 'An error occurred while delete token',
+        message: 'An error occurred while fetching data',
       },
     });
   }
