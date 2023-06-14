@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import predict_hotel
+import predict_wisata
 
 app = Flask(__name__)
 
@@ -24,7 +25,15 @@ def predictHotel():
         }
     return jsonify(response)
 
+@app.route('/api/predictTourism', methods=['POST'])
+def predictTourism():
+   city = request.form.get(["nama_daerah"])
 
+   predict_result = predict_wisata.recommend_places_2(city, top_n=5)
+   response = {
+       'data' : predict_result
+   }
+   return jsonify(response)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
