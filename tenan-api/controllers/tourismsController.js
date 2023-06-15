@@ -160,6 +160,18 @@ const getAllTourisms = async (req, res) => {
 const getTourismsDetail = async (req, res) => {
   try {
     const tourismsId = req.params.tourismsId;
+    let favorited = false;
+    const userId = req.user_id;
+    if (userId) {
+      const result = await knex('tourism_favorites').where({
+        user_id: userId,
+        id_wisata: tourismsId,
+      });
+      if (result.length == 1) {
+        favorited = true;
+      }
+    }
+
     const tourism = await knex('tourisms')
         .select('tourisms.id_wisata as tourism_id',
             'tourisms.nama_tempat as place_name',
@@ -185,6 +197,7 @@ const getTourismsDetail = async (req, res) => {
         },
       });
     } else {
+      tourism.favorited = favorited;
       return res.status(200).send({
         code: '200',
         status: 'OK',

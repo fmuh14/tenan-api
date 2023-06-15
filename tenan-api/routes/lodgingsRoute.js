@@ -5,8 +5,9 @@ const router = express.Router();
 const {
   getAllLodgings,
   getlodgingsDetail} = require('../controllers/lodgingsController');
+const {optionalAuthenticateAccessToken} = require('../middleware/authenticate');
 
 router.get('/', getAllLodgings);
-router.get('/:lodgingsId', getlodgingsDetail);
+router.get('/:lodgingsId', optionalAuthenticateAccessToken, getlodgingsDetail);
 
 module.exports = router;

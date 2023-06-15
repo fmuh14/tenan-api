@@ -118,7 +118,54 @@ const authenticateRefreshToken = (req, res, next) => {
       });
 };
 
+const optionalAuthenticateAccessToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == null) {
+    next();
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function(err, decoded) {
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        // Handle the expired token error
+        return res.status(401).send({
+          code: '401',
+          status: 'Unauthorized',
+          errors: {
+            message: 'Token expired. Please get new access token',
+          },
+        });
+      } else if (err.name === 'JsonWebTokenError') {
+        // Handle the invalid token error
+        return res.status(401).send({
+          code: '401',
+          status: 'Unauthorized',
+          errors: {
+            message: 'Token invalid',
+          },
+        });
+      }
+
+      console.log(err);
+      return res.status(401).send({
+        code: '401',
+        status: 'Unauthorized',
+        errors: {
+          message: 'Unknown Error',
+        },
+      });
+    }
+
+    req.email = decoded.email;
+    req.name = decoded.name;
+    req.user_id = decoded.user_id;
+    req.created_at = decoded.created_at;
+    next();
+  });
+};
+
 
 module.exports = {authenticateAccessToken,
-  authenticateRefreshToken};
+  authenticateRefreshToken,
+  optionalAuthenticateAccessToken};
 
