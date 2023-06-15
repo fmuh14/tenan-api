@@ -266,7 +266,7 @@ const getRecommendedTourisms = async (req, res) => {
   try {
     const city = req.body;
     const predictResponse = await axios.post(process.env.URL_ML_TOURISM, {
-      city : city,
+      city: city,
     });
 
     const predictData = predictResponse.data.data;
