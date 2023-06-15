@@ -264,9 +264,14 @@ const getRecommendedHotels = async (req, res) => {
 
 const getRecommendedTourisms = async (req, res) => {
   try {
-    const city = req.body;
+    const {city} = req.body;
+    console.log(city);
     const predictResponse = await axios.post(process.env.URL_ML_TOURISM, {
       city: city,
+    }, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
     });
 
     const predictData = predictResponse.data.data;
