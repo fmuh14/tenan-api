@@ -266,7 +266,7 @@ const getRecommendedTourisms = async (req, res) => {
   try {
     const city = req.body;
     const predictResponse = await axios.post(process.env.URL_ML_TOURISM, {
-      city : city,
+      city: city,
     });
 
     const predictData = predictResponse.data.data;
@@ -281,7 +281,7 @@ const getRecommendedTourisms = async (req, res) => {
         'tourimages.url_image as image_url')
         .leftJoin('cities', 'tourisms.id_daerah', 'cities.id_daerah')
         .leftJoin('tourimages', 'tourisms.id_wisata', 'tourimages.id_wisata')
-        .whereIn('tourisms.nama_tempat', predictData);
+        .whereIn('tourisms.id_wisata', predictData);
 
     return res.status(200).send({
       code: '200',

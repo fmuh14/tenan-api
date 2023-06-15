@@ -21,5 +21,8 @@ def recommend_places(city, top_n=5): #top_n = wisata
     recommendations = data_model[(data_model['City'].str.contains(city, case=False, na=False))]
     recommendations.sort_values(by='Rating', ascending=True, inplace=True)
 
+    predict_data = recommendations.head(top_n)
+
+    result = predict_data["Place_Id"].tolist()
     # Return the top_n results
-    return recommendations.head(top_n)
+    return result
