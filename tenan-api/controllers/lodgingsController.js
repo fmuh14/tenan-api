@@ -152,6 +152,18 @@ const getAllLodgings = async (req, res) => {
 const getlodgingsDetail = async (req, res) => {
   try {
     const lodgingsId = req.params.lodgingsId;
+    let favorited = false;
+    const userId = req.user_id;
+    if (userId) {
+      const result = await knex('lodging_favorites').where({
+        user_id: userId,
+        id_penginapan: lodgingsId,
+      });
+      if (result.length == 1) {
+        favorited = true;
+      }
+    }
+
     const lodging = await knex('lodgings')
         .select('lodgings.id_penginapan as lodging_id',
             'lodgings.nama_tempat as place_name',
@@ -176,6 +188,7 @@ const getlodgingsDetail = async (req, res) => {
         },
       });
     } else {
+      lodging.favorited = favorited;
       return res.status(200).send({
         code: '200',
         status: 'OK',
