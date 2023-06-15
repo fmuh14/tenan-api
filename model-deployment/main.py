@@ -15,8 +15,8 @@ def hello():
 
 @app.route('/api/predictHotel', methods=['POST'])
 def predictHotel():
-    longitude = float(request.form["longtitude"])  # replace with your longitude
-    latitude = float(request.form["latitude"]) # replace with your latitude
+    longitude = float(request.form["longtitude"])  
+    latitude = float(request.form["latitude"]) 
 
     
     predict_result = predict_hotel.predict_rating(longitude,latitude)
@@ -27,13 +27,13 @@ def predictHotel():
 
 @app.route('/api/predictTourism', methods=['POST'])
 def predictTourism():
-   city = str(request.form(["city"]))
+    city = request.form["city"]
 
-   predict_result = predict_wisata.recommend_places(city, top_n=5)
-   response = {
-       'data' : predict_result
-   }
-   return jsonify(response)
+    predict_result = predict_wisata.recommend_places(city, top_n=5)
+    response = {
+        'data' : predict_result
+    }
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
