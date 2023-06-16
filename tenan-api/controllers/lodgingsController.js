@@ -184,7 +184,7 @@ const getlodgingsDetail = async (req, res) => {
         code: '404',
         status: 'Not Found',
         errors: {
-          message: 'Lodging not found.',
+          message: 'Lodging not found',
         },
       });
     } else {

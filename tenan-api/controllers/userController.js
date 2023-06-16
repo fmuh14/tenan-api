@@ -234,9 +234,9 @@ const addFavoriteTourism = async (req, res) => {
         .where(data);
 
     if (checkIfFavoritedExist.length != 0) {
-      return res.status(404).send({
-        code: '404',
-        status: 'Not Found',
+      return res.status(409).send({
+        code: '409',
+        status: 'Conflict',
         errors: {
           message:
           'the tourism ID you provided already added to your favorites',
@@ -371,9 +371,9 @@ const addFavoriteLodging = async (req, res) => {
         .where(data);
 
     if (checkIfFavoritedExist.length != 0) {
-      return res.status(404).send({
-        code: '404',
-        status: 'Not Found',
+      return res.status(409).send({
+        code: '409',
+        status: 'Conflict',
         errors: {
           message:
           'the lodging ID you provided already added to your favorites',
