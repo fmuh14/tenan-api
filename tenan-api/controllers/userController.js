@@ -173,7 +173,7 @@ const logout = async (req, res) => {
       return res.status(200).send({
         code: '200',
         status: 'OK',
-        errors: {
+        data: {
           message: 'Sign out success',
         },
       });
