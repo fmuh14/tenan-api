@@ -253,9 +253,12 @@ const getRecommendedHotels = async (req, res) => {
         'lodgings.id_penginapan as lodging_id',
         'lodgings.nama_tempat as place_name',
         'lodgings.rating',
-        'cities.nama_daerah as city')
+        'cities.nama_daerah as city',
+        'lodimages.url_image as image_url')
         .from('lodgings')
         .leftJoin('cities', 'lodgings.id_daerah', 'cities.id_daerah')
+        .leftJoin('lodimages', 'lodgings.id_penginapan',
+            'lodimages.id_penginapan')
         .whereIn('lodgings.nama_tempat', predictData);
 
     return res.status(200).send({
