@@ -1,11 +1,14 @@
 const jwt = require('jsonwebtoken');
-const saltRounds = 10;
 const bcrypt = require('bcrypt');
 const {knex} = require('../configs/data-source.js');
 const {
   validateEmail,
   validatePassword,
 } = require('../utils/validation.js');
+const {
+  createUser,
+  createAccessToken,
+  createRefreshToken} = require('../utils/creation.js');
 
 const register = async (req, res) => {
   const {name, email, password} = req.body;
@@ -44,8 +47,19 @@ const register = async (req, res) => {
   }
 
   // Validate Email Exists
-  const verifEmail = await knex('users').where('email', email);
-  if (verifEmail.length !== 0) {
+  const verifEmailResponse = await knex('users').where('email', email)
+      .catch((err) => {
+        return err;
+      });
+  if (!Array.isArray(verifEmailResponse)) {
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: `DatabaseError: ${verifEmailResponse.code}`,
+      },
+    });
+  } else if (verifEmailResponse.length !== 0) {
     return res.status(409).send({
       code: '409',
       status: 'Conflict',
@@ -61,20 +75,40 @@ const register = async (req, res) => {
     password,
   };
 
-  // Password hashing
-  bcrypt.genSalt(saltRounds, function(err, salt) {
-    bcrypt.hash(user.password, salt, function(err, hash) {
-      if (err) throw err;
-      user.password = hash;
-      // Store user to DB
-      knex('users').insert(user).then(res.status(200).send({
-        code: '200',
-        status: 'OK',
-        data: {
-          message: 'Register Success. Please Log in',
-        },
-      }));
+  // // Password hashing
+  // bcrypt.genSalt(saltRounds, function(err, salt) {
+  //   bcrypt.hash(user.password, salt, function(err, hash) {
+  //     if (err) throw err;
+  //     user.password = hash;
+  //     // Store user to DB
+  //     knex('users').insert(user).then(res.status(200).send({
+  //       code: '200',
+  //       status: 'OK',
+  //       data: {
+  //         message: 'Register Success. Please Log in',
+  //       },
+  //     }));
+  //   });
+  // });
+
+  const createUserResponse = await createUser(user);
+
+  if (!Array.isArray(createUserResponse)) {
+    return res.status(500).send({
+      code: '500',
+      status: 'Internal Server Error',
+      errors: {
+        message: `DatabaseError: ${createUserResponse.code}`,
+      },
     });
+  }
+
+  return res.status(200).send({
+    code: '200',
+    status: 'OK',
+    data: {
+      message: 'Register Success. Please Log in',
+    },
   });
 };
 
@@ -105,10 +139,8 @@ const login = async (req, res) => {
       };
 
       // Make JWT
-      const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,
-          {expiresIn: '1hr'});
-      const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET,
-          {expiresIn: '365d'});
+      const accessToken = createAccessToken(user);
+      const refreshToken = createRefreshToken(user);
 
       jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET,
           function(err, decoded) {
@@ -150,8 +182,7 @@ const token = async (req, res) => {
   };
 
   // Make JWT
-  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,
-      {expiresIn: '1hr'});
+  const accessToken = createAccessToken(user);
 
   return res.status(200).send({
     code: '200',

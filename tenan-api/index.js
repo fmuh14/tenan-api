@@ -47,6 +47,10 @@ app.use(function(req, res, next) {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Tenan app listening at http://localhost:${port}`);
-});
+if ((process.env.NODE_ENV || '').trim() !== 'test') {
+  app.listen(port, () => {
+    console.log(`Tenan app listening at http://localhost:${port}`);
+  });
+}
+
+module.exports = app;

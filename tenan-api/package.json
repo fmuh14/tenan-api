@@ -4,9 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "SET NODE_ENV=test & jest --forceExit --detectOpenHandles  --watchAll --runInBand",
     "start-dev": "nodemon index.js",
     "start": "node index.js"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    },
+    "collectCoverage": true,
+    "verbose": true
   },
   "author": "",
   "license": "ISC",
@@ -21,8 +28,14 @@
     "nanoid": "^4.0.2"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.17.12",
+    "@babel/preset-env": "^7.17.12",
+    "@types/jest": "^29.5.3",
+    "babel-jest": "^28.1.0",
     "eslint": "^8.40.0",
     "eslint-config-google": "^0.14.0",
-    "nodemon": "^2.0.22"
+    "jest": "^28.1.0",
+    "nodemon": "^2.0.22",
+    "supertest": "^6.3.3"
   }
 }
