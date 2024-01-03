@@ -261,10 +261,17 @@ const addFavoriteTourism = async (req, res) => {
       });
     };
 
-    const checkIfFavoritedExist = await knex('tourism_favorites')
-        .where(data);
+    await knex('tourism_favorites').insert(data);
 
-    if (checkIfFavoritedExist.length != 0) {
+    return res.status(200).send({
+      code: '200',
+      status: 'OK',
+      data: {
+        message: 'Added to favorites',
+      },
+    });
+  } catch (error) {
+    if (error.errno == 1062) {
       return res.status(409).send({
         code: '409',
         status: 'Conflict',
@@ -274,15 +281,6 @@ const addFavoriteTourism = async (req, res) => {
         },
       });
     }
-
-    knex('tourism_favorites').insert(data).then(res.status(200).send({
-      code: '200',
-      status: 'OK',
-      data: {
-        message: 'Added to favorites',
-      },
-    }));
-  } catch (error) {
     console.error(error);
     return res.status(500).send({
       code: '500',
@@ -398,10 +396,17 @@ const addFavoriteLodging = async (req, res) => {
       });
     };
 
-    const checkIfFavoritedExist = await knex('lodging_favorites')
-        .where(data);
+    await knex('lodging_favorites').insert(data);
 
-    if (checkIfFavoritedExist.length != 0) {
+    res.status(200).send({
+      code: '200',
+      status: 'OK',
+      data: {
+        message: 'Added to favorites',
+      },
+    });
+  } catch (error) {
+    if (error.errno == 1062) {
       return res.status(409).send({
         code: '409',
         status: 'Conflict',
@@ -411,15 +416,6 @@ const addFavoriteLodging = async (req, res) => {
         },
       });
     }
-
-    knex('lodging_favorites').insert(data).then(res.status(200).send({
-      code: '200',
-      status: 'OK',
-      data: {
-        message: 'Added to favorites',
-      },
-    }));
-  } catch (error) {
     console.error(error);
     return res.status(500).send({
       code: '500',

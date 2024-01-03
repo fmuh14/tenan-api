@@ -98,9 +98,7 @@ const authenticateRefreshToken = (req, res, next) => {
           });
         }
 
-        console.log('refreshToken in auth.js :', token);
         const checkOnDatabase = await knex('tokens').where('token', token);
-        console.log(checkOnDatabase);
         if (checkOnDatabase.length == 0) {
           return res.status(401).send({
             code: '401',

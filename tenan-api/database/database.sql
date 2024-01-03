@@ -55,7 +55,9 @@ CREATE table tourism_favorites (
   user_id int NOT NULL,
   id_wisata int NOT NULL,
   FOREIGN KEY (id_wisata) REFERENCES tourisms(id_wisata) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id, id_wisata),
+  UNIQUE KEY user_wisata_unique (user_id, id_wisata)  
 );
 
 CREATE Table lodgings (
@@ -80,7 +82,9 @@ CREATE table lodging_favorites (
   user_id int NOT NULL,
   id_penginapan int NOT NULL,
   FOREIGN KEY (id_penginapan) REFERENCES lodgings(id_penginapan) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id, id_penginapan),
+  UNIQUE KEY user_penginapan_unique (user_id, id_penginapan)
 );
 
 /* Location of tempat_wisata_msyql_csv */
