@@ -98,7 +98,9 @@ const authenticateRefreshToken = (req, res, next) => {
           });
         }
 
+        console.log('refreshToken in auth.js :', token);
         const checkOnDatabase = await knex('tokens').where('token', token);
+        console.log(checkOnDatabase);
         if (checkOnDatabase.length == 0) {
           return res.status(401).send({
             code: '401',
@@ -141,7 +143,7 @@ const optionalAuthenticateAccessToken = (req, res, next) => {
             code: '401',
             status: 'Unauthorized',
             errors: {
-              message: 'Token invalid',
+              message: 'Token invalid. Please sign in again',
             },
           });
         }

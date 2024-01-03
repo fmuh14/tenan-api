@@ -5,18 +5,16 @@ const {createTestUser} = require('../dataTest.js');
 
 const {validUserLogin, validUserRegister} = createTestUser();
 
-const expectResponseProperties = (response, tourismId) => {
+const expectResponseProperties = (response, lodgingId) => {
   expect(response.statusCode).toBe(200);
 
   expect(response.body.code).toBe('200');
   expect(response.body.status).toBe('OK');
   expect(response.body.data).toEqual(expect.any(Object));
-  expect(response.body.data).toHaveProperty('tourism_id');
-  expect(response.body.data.tourism_id).toBe(tourismId);
+  expect(response.body.data).toHaveProperty('lodging_id');
+  expect(response.body.data.lodging_id).toBe(lodgingId);
   expect(response.body.data).toHaveProperty('place_name');
   expect(response.body.data).toHaveProperty('rating');
-  expect(response.body.data).toHaveProperty('category');
-  expect(response.body.data).toHaveProperty('description');
   expect(response.body.data).toHaveProperty('longtitude');
   expect(response.body.data).toHaveProperty('latitude');
   expect(response.body.data).toHaveProperty('address');
@@ -25,15 +23,19 @@ const expectResponseProperties = (response, tourismId) => {
   expect(response.body.data).toHaveProperty('favorited');
 };
 
-describe('tourism', () => {
+describe('lodging', () => {
   beforeAll(async () => {
     await request(app).post('/v1/user/signup')
         .send(validUserRegister);
   });
 
-  describe('get all tourism data', () => {
+  afterAll(async () => {
+    await knex('users').where('email', validUserRegister.email).del();
+  });
+
+  describe('get all lodging data', () => {
     it('should request using no query params', async () => {
-      const response = await request(app).get('/v1/tourisms');
+      const response = await request(app).get('/v1/lodgings');
 
       expect(response.statusCode).toBe(200);
 
@@ -49,7 +51,7 @@ describe('tourism', () => {
 
     it('should request using page params', async () => {
       const pageNumber = 2;
-      const response = await request(app).get('/v1/tourisms')
+      const response = await request(app).get('/v1/lodgings')
           .query({
             'page': pageNumber,
           });
@@ -68,7 +70,7 @@ describe('tourism', () => {
 
     it('should request using page params but NaN', async () => {
       const pageNumber = 'JAJAJA';
-      const response = await request(app).get('/v1/tourisms')
+      const response = await request(app).get('/v1/lodgings')
           .query({
             'page': pageNumber,
           });
@@ -88,7 +90,7 @@ describe('tourism', () => {
     it('should request using page query params but greater than total page',
         async () => {
           const pageNumber = 99999999;
-          const response = await request(app).get('/v1/tourisms')
+          const response = await request(app).get('/v1/lodgings')
               .query({
                 'page': pageNumber,
               });
@@ -102,8 +104,8 @@ describe('tourism', () => {
         });
 
     it('should request using q query params and found the result', async () => {
-      const q = 'moNuMen';
-      const response = await request(app).get('/v1/tourisms')
+      const q = 'MuLiA';
+      const response = await request(app).get('/v1/lodgings')
           .query({
             'q': q,
           });
@@ -125,7 +127,7 @@ describe('tourism', () => {
     it('should request using q query params and not found the result',
         async () => {
           const q = 'NOTFOUNDRESULT';
-          const response = await request(app).get('/v1/tourisms')
+          const response = await request(app).get('/v1/lodgings')
               .query({
                 'q': q,
               });
@@ -140,7 +142,7 @@ describe('tourism', () => {
 
     it('should request using city params and found the result', async () => {
       const city = 'JaKarTa';
-      const response = await request(app).get('/v1/tourisms')
+      const response = await request(app).get('/v1/lodgings')
           .query({
             'city': city,
           });
@@ -162,7 +164,7 @@ describe('tourism', () => {
     it('should request using city query params and not found the result',
         async () => {
           const city = 'NOTFOUNDRESULT';
-          const response = await request(app).get('/v1/tourisms')
+          const response = await request(app).get('/v1/lodgings')
               .query({
                 'city': city,
               });
@@ -176,16 +178,16 @@ describe('tourism', () => {
         });
   });
 
-  describe('get detailed information about one tourism', () => {
-    it('should return tourism info, but were not login', async () => {
-      const tourismId = 5;
-      const response = await request(app).get(`/v1/tourisms/${tourismId}`);
+  describe('get detailed information about one lodging', () => {
+    it('should return lodging info, but were not login', async () => {
+      const lodgingId = 5;
+      const response = await request(app).get(`/v1/lodgings/${lodgingId}`);
 
-      expectResponseProperties(response, tourismId);
+      expectResponseProperties(response, lodgingId);
     });
   });
 
-  describe('get detailed information about one tourism with auth', () => {
+  describe('get detailed information about one lodging with auth', () => {
     let accessToken;
     beforeAll(async () => {
       const responseLogin = await request(app).post('/v1/user/signin')
@@ -193,17 +195,17 @@ describe('tourism', () => {
       accessToken = responseLogin.body.data.accessToken;
     });
 
-    it('should return tourism info', async () => {
-      const tourismId = 5;
-      const response = await request(app).get(`/v1/tourisms/${tourismId}`)
+    it('should return lodging info', async () => {
+      const lodgingId = 5;
+      const response = await request(app).get(`/v1/lodgings/${lodgingId}`)
           .set('authorization', `Bearer ${accessToken}`);
 
-      expectResponseProperties(response, tourismId);
+      expectResponseProperties(response, lodgingId);
     });
 
     it('should return token invalid', async () => {
-      const tourismId = 5;
-      const response = await request(app).get(`/v1/tourisms/${tourismId}`)
+      const lodgingId = 5;
+      const response = await request(app).get(`/v1/lodgings/${lodgingId}`)
           .set('authorization', `Bearer HAHAHAHAH`);
 
       expect(response.statusCode).toBe(401);
@@ -213,21 +215,5 @@ describe('tourism', () => {
       expect(response.body.errors.message)
           .toBe('Token invalid. Please sign in again');
     });
-  });
-
-  describe('get all city', () => {
-    it('should get all city', async () => {
-      const response = await request(app).get(`/v1/tourisms/city`);
-
-      expect(response.statusCode).toBe(200);
-
-      expect(response.body.code).toBe('200');
-      expect(response.body.status).toBe('OK');
-      expect(response.body.data).toEqual(expect.any(Array));
-    });
-  });
-
-  afterAll(async () => {
-    await knex('users').where('email', validUserRegister.email).del();
   });
 });

@@ -1,12 +1,9 @@
 const request = require('supertest');
 const app = require('../../index');
 const {knex} = require('../../configs/data-source.js');
+const {createTestUser} = require('../dataTest.js');
 
-const validUserRegister = {
-  email: 'test@example.com',
-  name: 'John Doe',
-  password: 'testuser1234',
-};
+const {validUserRegister} = createTestUser();
 
 describe('user registration', () => {
   describe('given the email, name and password are valid', () => {
@@ -136,5 +133,3 @@ describe('user registration', () => {
     await knex('users').where('email', validUserRegister.email).del();
   });
 });
-
-module.exports = validUserRegister;

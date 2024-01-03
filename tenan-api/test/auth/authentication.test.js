@@ -1,15 +1,13 @@
 const request = require('supertest');
 const app = require('../../index');
 const {knex} = require('../../configs/data-source.js');
-const validUserRegister = require('./register.test.js');
+const {createTestUser} = require('../dataTest.js');
 
-const validUserLogin = {
-  email: 'test@example.com',
-  password: 'testuser1234',
-};
+const {validUserLogin, validUserRegister} = createTestUser();
 
 describe('authentication', () => {
   beforeAll(async () => {
+    console.log('creating user data in beforeAll hook...');
     await request(app).post('/v1/user/signup').send(validUserRegister);
   });
 
@@ -28,6 +26,11 @@ describe('authentication', () => {
             .toEqual(expect.any(String));
 
         const refreshToken = responseLogin.body.data.refreshToken;
+        console.log('refreshToken from Test :', refreshToken);
+
+        const dataRefreshToken = knex.select('token').from('tokens');
+
+        console.log(dataRefreshToken);
 
         const responseLogout = await request(app).post('/v1/user/signout')
             .set('authorization', `Bearer ${refreshToken}`)
@@ -149,5 +152,3 @@ describe('authentication', () => {
     await knex('users').where('email', validUserRegister.email).del();
   });
 });
-
-module.exports = validUserLogin;
